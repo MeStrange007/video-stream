@@ -7,7 +7,7 @@ import Peer from 'simple-peer';
 const File = () => {
   const videoPlayer = useRef<HTMLVideoElement>(null);
   const serverUrl = process.env.SERVER_URL || "http://192.168.43.30:3000"
-  const socketRef = useRef(io('http://192.168.43.30:3000'))
+  const socketRef = useRef(io(serverUrl))
 
   useEffect(() => {
     const video = videoPlayer.current;

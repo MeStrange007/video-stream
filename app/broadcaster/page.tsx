@@ -18,7 +18,7 @@ const File = () => {
   }, []);
 
   const serverUrl = process.env.SERVER_URL || "http://192.168.43.30:3000"
-  const socketRef = useRef(io('http://192.168.43.30:3000'))
+  const socketRef = useRef(io(serverUrl))
   // var Audctx = new AudioContext
   // var dst = Audctx.createMediaStreamDestination();
 
