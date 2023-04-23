@@ -18,12 +18,13 @@ const File = () => {
   }, []);
 
   const serverUrl = process.env.SERVER_URL || "http://192.168.43.30:3000"
-  const socketRef = useRef(io(serverUrl))
+  const socketRef = useRef(io("https://video-stream-phti.onrender.com"))
   // var Audctx = new AudioContext
   // var dst = Audctx.createMediaStreamDestination();
 
 
   useEffect(() => {
+    console.log(process.env.SERVER_URL)
     const canvas = canvasPlayer.current;
     if (canvas == null) return;
     const ctx = canvas.getContext("2d");
