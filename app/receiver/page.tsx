@@ -8,7 +8,7 @@ const File = () => {
   const videoPlayer = useRef<HTMLVideoElement>(null);
   const serverUrl = process.env.SERVER_URL || "http://192.168.43.30:3000"
   const socketRef = useRef(io("https://video-stream-phti.onrender.com"))
-
+  // const socketRef = useRef(io(serverUrl))
   useEffect(() => {
     const video = videoPlayer.current;
     if (video == null) return;
@@ -18,7 +18,7 @@ const File = () => {
 
     peer.on('signal',(data)=>{
       console.log("in receiver peer signal");
-      
+      console.log(socket.id);
       socket.emit("request-stream",({sender:socket.id,signal:data}))
     })
     

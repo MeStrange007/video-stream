@@ -17,8 +17,9 @@ const File = () => {
     e.target.files ? setSrc(URL.createObjectURL(e.target.files[0])) : "";
   }, []);
 
-  const serverUrl = process.env.SERVER_URL || "http://192.168.43.30:3000"
+  // const serverUrl = process.env.SERVER_URL || "http://192.168.43.30:3000"
   const socketRef = useRef(io("https://video-stream-phti.onrender.com"))
+  // const socketRef = useRef(io(serverUrl))
   // var Audctx = new AudioContext
   // var dst = Audctx.createMediaStreamDestination();
 
@@ -71,6 +72,7 @@ const File = () => {
 
         peer.on('signal', (data) => {
           console.log("In broadcaster peer signal");
+          console.log("Sending: ",data);
           
           socket.emit('stream', { signal: data, to: request.sender });
         });
