@@ -25,9 +25,9 @@ const VideoInterface:React.FC<videoStream> = ({params}) => {
     e.target.files ? setSrc(URL.createObjectURL(e.target.files[0])) : "";
   }, []);
 
-  // const serverUrl = process.env.SERVER_URL || "http://192.168.43.30:3000"
-  const socketRef = useRef(io("https://video-stream-phti.onrender.com"))
-  // const socketRef = useRef(io(serverUrl))
+  const serverUrl = process.env.SERVER_URL || "http://192.168.43.30:3000"
+  // const socketRef = useRef(io("https://video-stream-phti.onrender.com"))
+  const socketRef = useRef(io(serverUrl))
   // var Audctx = new AudioContext
   // var dst = Audctx.createMediaStreamDestination();
 
@@ -50,6 +50,11 @@ const VideoInterface:React.FC<videoStream> = ({params}) => {
     //     }
         
       // })
+
+    const audioCtx = new AudioContext();  
+    var destination:MediaStreamAudioDestinationNode;
+    var source:MediaElementAudioSourceNode;
+    
     video.addEventListener("loadedmetadata", () => {
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
@@ -63,48 +68,27 @@ const VideoInterface:React.FC<videoStream> = ({params}) => {
       video.play();
     });
     video.onplaying = () => {
-      // console.log("here");
-      const socket = socketRef.current
-      // console.log(socket.id);
-      var stream = canvas.captureStream()
-      // Audctx.createMediaElementSource(video).connect(dst);
-      // const mediaStream = video.srcObject as MediaStream;
-      // const audioTracks = mediaStream.getAudioTracks();
-      // stream.addTrack(dst.stream.getAudioTracks()[0])
+      const socket = socketRef.current   
+      destination = audioCtx.createMediaStreamDestination();
+      source = audioCtx.createMediaElementSource(video);
+      source.connect(destination);
+      const canvasStream = canvas.captureStream();
+      const audioStream = destination.stream;
+      // canvasStream.addTrack(audioStream.getTracks()[0])
+      const stream = new MediaStream([...canvasStream.getTracks(), ...audioStream.getTracks()]);
+      // const stream = canvasStream
+      // var stream = canvas.captureStream()
       socket.emit('broadcaster',roomName);
-
       socket.on("send-stream",(request)=>{
         console.log("In broadcaster send-stream");
-        
         const peer = new Peer({ initiator: false, trickle: false, stream });
-
         peer.on('signal', (data) => {
           console.log("In broadcaster peer signal");
           console.log("Sending: ",data);
-          
           socket.emit('stream', { signal: data, to: request.sender });
         });
-
         peer.signal(request.signal)
-
       })
-      // socket.on("send-Stream",(data)=>{
-      //   console.log(data);
-        
-      // })
-      // socket.on("send-stream",())
-      // const peer = new Peer({ initiator: false, trickle: false, stream });
-      // peer.on('signal',(data)=>{
-      //   socket.emit("stream",data)
-      // })
-      // socket.emit('world',"my msg")
-      // socket.on("hello",(msg)=>{
-      //   console.log(msg);
-        
-      // })
-          
-      // console.log({stream,src});
-      // socket.emit('stream', {stream,src});
     }
   }, [src]);
 
