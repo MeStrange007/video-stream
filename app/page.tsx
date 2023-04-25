@@ -1,7 +1,7 @@
 
 import Image from 'next/image'
 import { Inter } from 'next/font/google'
-import File from './Components/File'
+// import File from './Components/File'
 
 import Link from 'next/link'
 
