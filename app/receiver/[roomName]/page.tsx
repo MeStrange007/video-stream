@@ -14,47 +14,51 @@ const VideoInterface:React.FC<videoStream> = ({params}) => {
   const roomName = params.roomName
 
   const videoPlayer = useRef<HTMLVideoElement>(null);
-  const serverUrl = process.env.SERVER_URL || "http://192.168.43.30:3000"
-//   const socketRef = useRef(io("https://video-stream-phti.onrender.com"))
-  const socketRef = useRef(io(serverUrl))
+  // const serverUrl = process.env.SERVER_URL || "http://192.168.43.30:3000"
+  const socketRef = useRef(io("https://video-stream-phti.onrender.com"))
+  // const socketRef = useRef(io(serverUrl))
+
+  const [recID,setRecID] = useState('')
+
+  useEffect(()=>{
+    const socket = socketRef.current
+    socket.emit('viewer');
+    socket.on("receiveID",(data)=>{
+      setRecID(data.id)
+      console.log("Receive ID",data.id);
+      
+    })
+  },[])
 
   useEffect(() => {
-    const video = videoPlayer.current;
-    if (video == null) return;
-    const socket = socketRef.current
-    socket.emit('viewer',{id:socket.id});
-    
-        const peer = new Peer({ initiator: true, trickle: false });
+    if (recID!=''){
+      const video = videoPlayer.current;
+      if (video == null) return;
+      const socket = socketRef.current
+      
+      const peer = new Peer({ initiator: true, trickle: false });
 
-        peer.on('signal',(data)=>{
-        console.log("in receiver peer signal");
-        console.log(socket.id);
-        socket.emit("request-stream",({sender:socket.id,signal:data,to:roomName}))
-        })
-        
-        peer.on('stream',(currentStream)=>{
-        console.log("In receiver peer stream");
-        console.log(currentStream);
-        
-        video.srcObject = currentStream
-        video.play()
-        })
+      peer.on('signal',(data)=>{
+      console.log("in receiver peer signal");
+      console.log(recID);
+      socket.emit("request-stream",({sender:recID,signal:data,to:roomName}))
+      })
+      
+      peer.on('stream',(currentStream)=>{
+      console.log("In receiver peer stream");
+      console.log(currentStream);
+      
+      video.srcObject = currentStream
+      video.play()
+      })
 
-        socket.on("recieve-stream",(data)=>{
-        console.log("In receiver receive-stream");
-        
-        peer.signal(data);
-        })
-    
-    
-
-    // socket.on('viewerStream', (stream) => {
-    //     console.log(stream);
-        
-    //     video.srcObject = stream;
-    //     video.play();
-    // });
-  }, [socketRef.current.id]);
+      socket.on("recieve-stream",(data)=>{
+      console.log("In receiver receive-stream");
+      
+      peer.signal(data);
+      })
+    }
+  }, [recID]);
 
 
 
