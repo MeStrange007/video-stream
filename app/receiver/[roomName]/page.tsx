@@ -14,7 +14,7 @@ const VideoInterface:React.FC<videoStream> = ({params}) => {
   const roomName = params.roomName
 
   const videoPlayer = useRef<HTMLVideoElement>(null);
-  // const serverUrl = process.env.SERVER_URL || "http://192.168.43.30:3000"
+  // const serverUrl = process.env.SERVER_URL || "http://localhost:3000"
   const socketRef = useRef(io("https://video-stream-phti.onrender.com"))
   // const socketRef = useRef(io(serverUrl))
 
